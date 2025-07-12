@@ -4,7 +4,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Github, Linkedin, Mail, Twitter } from "lucide-react"
 import Image from "next/image"
-import image1 from "@/public/image1.png"
 import Lanyard from "@/components/ui/lanyard"
 
 interface PortfolioLandingProps {
@@ -39,7 +38,13 @@ export default function PortfolioLanding({ onModeSelect }: PortfolioLandingProps
           {/* Personal branding */}
           <div className="mb-8">
             <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden border-2 border-gray-700">
-              <Image src={image1 || "/placeholder.svg"} alt="Shaheer Naeem" className="w-full h-full object-cover" />
+              <Image 
+                src="/image1.png" 
+                width={96} 
+                height={96} 
+                alt="Shaheer Naeem" 
+                className="w-full h-full object-cover" 
+              />
             </div>
             <h2 className="text-xl text-gray-300 font-light mb-2">Shaheer Naeem</h2>
             <p className="text-gray-500 text-sm">Full Stack Developer & UI/UX Designer</p>

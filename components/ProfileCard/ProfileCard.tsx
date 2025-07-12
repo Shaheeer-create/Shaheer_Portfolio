@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useEffect, useRef, useCallback, useMemo, useState } from "react";
 import "./ProfileCard.css";
 import Image from "next/image";
 
@@ -72,6 +72,20 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
 }) => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTouching, setIsTouching] = useState(false);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const animationHandlers = useMemo(() => {
     if (!enableTilt) return null;
@@ -93,6 +107,9 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
       const centerX = percentX - 50;
       const centerY = percentY - 50;
 
+      // Reduce tilt intensity on mobile for better UX
+      const tiltMultiplier = isMobile ? 0.3 : 1;
+
       const properties = {
         "--pointer-x": `${percentX}%`,
         "--pointer-y": `${percentY}%`,
@@ -101,8 +118,8 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
         "--pointer-from-center": `${clamp(Math.hypot(percentY - 50, percentX - 50) / 50, 0, 1)}`,
         "--pointer-from-top": `${percentY / 100}`,
         "--pointer-from-left": `${percentX / 100}`,
-        "--rotate-x": `${round(-(centerX / 5))}deg`,
-        "--rotate-y": `${round(centerY / 4)}deg`,
+        "--rotate-x": `${round(-(centerX / 5) * tiltMultiplier)}deg`,
+        "--rotate-y": `${round(centerY / 4) * tiltMultiplier}deg`,
       };
 
       Object.entries(properties).forEach(([property, value]) => {
@@ -149,7 +166,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
         }
       },
     };
-  }, [enableTilt]);
+  }, [enableTilt, isMobile]);
 
   const handlePointerMove = useCallback(
     (event: PointerEvent) => {
@@ -199,6 +216,57 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
     },
     [animationHandlers]
   );
+
+  // Touch event handlers for mobile
+  const handleTouchStart = useCallback((event: React.TouchEvent) => {
+    setIsTouching(true);
+    const card = cardRef.current;
+    const wrap = wrapRef.current;
+
+    if (!card || !wrap || !animationHandlers) return;
+
+    animationHandlers.cancelAnimation();
+    wrap.classList.add("active");
+    card.classList.add("active");
+  }, [animationHandlers]);
+
+  const handleTouchMove = useCallback((event: React.TouchEvent) => {
+    const card = cardRef.current;
+    const wrap = wrapRef.current;
+
+    if (!card || !wrap || !animationHandlers) return;
+
+    const touch = event.touches[0];
+    const rect = card.getBoundingClientRect();
+    
+    animationHandlers.updateCardTransform(
+      touch.clientX - rect.left,
+      touch.clientY - rect.top,
+      card,
+      wrap
+    );
+  }, [animationHandlers]);
+
+  const handleTouchEnd = useCallback((event: React.TouchEvent) => {
+    setIsTouching(false);
+    const card = cardRef.current;
+    const wrap = wrapRef.current;
+
+    if (!card || !wrap || !animationHandlers) return;
+
+    const touch = event.changedTouches[0];
+    const rect = card.getBoundingClientRect();
+    
+    animationHandlers.createSmoothAnimation(
+      ANIMATION_CONFIG.SMOOTH_DURATION,
+      touch.clientX - rect.left,
+      touch.clientY - rect.top,
+      card,
+      wrap
+    );
+    wrap.classList.remove("active");
+    card.classList.remove("active");
+  }, [animationHandlers]);
 
   useEffect(() => {
     if (!enableTilt || !animationHandlers) return;
@@ -265,7 +333,13 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
       className={`pc-card-wrapper ${className}`.trim()}
       style={cardStyle}
     >
-      <section ref={cardRef} className="pc-card">
+      <section 
+        ref={cardRef} 
+        className="pc-card"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         <div className="pc-inside">
           <div className="pc-shine" />
           <div className="pc-glare" />
@@ -274,6 +348,8 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
               className="avatar"
               src={avatarUrl}
               alt={`${name || "User"} avatar`}
+              width={400}
+              height={600}
               loading="lazy"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
@@ -287,6 +363,8 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                     <Image
                       src={miniAvatarUrl || avatarUrl}
                       alt={`${name || "User"} mini avatar`}
+                      width={48}
+                      height={48}
                       loading="lazy"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;

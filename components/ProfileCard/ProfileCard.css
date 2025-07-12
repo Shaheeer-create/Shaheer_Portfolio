@@ -33,6 +33,12 @@
     transform: translate3d(0, 0, 0.1px);
     position: relative;
     touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
   
   .pc-card-wrapper::before {
@@ -63,6 +69,7 @@
   .pc-card {
     height: 80svh;
     max-height: 540px;
+    min-height: 400px;
     display: grid;
     aspect-ratio: 0.718;
     border-radius: var(--card-radius);
@@ -76,6 +83,7 @@
     background-position: 0 0, 0 0, 50% 50%, 0 0;
     background-image: radial-gradient(farthest-side circle at var(--pointer-x) var(--pointer-y), hsla(266, 100%, 90%, var(--card-opacity)) 4%, hsla(266, 50%, 80%, calc(var(--card-opacity) * 0.75)) 10%, hsla(266, 25%, 70%, calc(var(--card-opacity) * 0.5)) 50%, hsla(266, 0%, 60%, 0) 100%), radial-gradient(35% 52% at 55% 20%, #00ffaac4 0%, #073aff00 100%), radial-gradient(100% 100% at 50% 50%, #00c1ffff 1%, #073aff00 76%), conic-gradient(from 124deg at 50% 50%, #c137ffff 0%, #07c6ffff 40%, #07c6ffff 60%, #c137ffff 100%);
     overflow: hidden;
+    cursor: pointer;
   }
   
   .pc-card:hover,
@@ -252,142 +260,138 @@
   
   .pc-handle {
     font-size: 14px;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.9);
-    line-height: 1;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
   }
   
   .pc-status {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
-    line-height: 1;
+    font-size: 12px;
+    color: #00ffaa;
+    font-weight: 500;
   }
   
   .pc-contact-btn {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
     padding: 8px 16px;
-    font-size: 14px;
+    border-radius: 20px;
+    font-size: 12px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
     cursor: pointer;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
   }
   
   .pc-contact-btn:hover {
-    border-color: rgba(255, 255, 255, 0.4);
-    transform: translateY(-1px);
-    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
   }
   
   .pc-content {
-    max-height: 100%;
-    overflow: hidden;
-    text-align: center;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 20px;
+    z-index: 2;
     position: relative;
-    transform: translate3d(calc(var(--pointer-from-left) * -6px + 3px), calc(var(--pointer-from-top) * -6px + 3px), 0.1px) !important;
-    z-index: 5;
-    mix-blend-mode: luminosity;
   }
   
   .pc-details {
-    width: 100%;
-    position: absolute;
-    top: 3em;
     display: flex;
     flex-direction: column;
+    gap: 8px;
+    color: #fff;
+    position: absolute;
+    bottom: 100px;
+    left: 20px;
+    right: 20px;
+    z-index: 3;
   }
   
   .pc-details h3 {
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
     margin: 0;
-    font-size: min(5svh, 3em);
-    margin: 0;
-    background-image: linear-gradient(to bottom, #fff, #6f6fbe);
-    background-size: 1em 1.5em;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    -webkit-background-clip: text;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   }
   
   .pc-details p {
-    font-weight: 600;
-    position: relative;
-    top: -12px;
-    white-space: nowrap;
     font-size: 16px;
-    margin: 0 auto;
-    width: min-content;
-    background-image: linear-gradient(to bottom, #fff, #4a4ac0);
-    background-size: 1em 1.5em;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    -webkit-background-clip: text;
+    font-weight: 400;
+    line-height: 1.4;
+    margin: 0;
+    opacity: 0.8;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
   
   @keyframes glow-bg {
-    0% {
-      --bgrotate: 0deg;
+    0%, 100% {
+      background-position: 0% 0%, 0% 0%, 50% 50%, 0% 0%;
     }
-  
-    100% {
-      --bgrotate: 360deg;
+    50% {
+      background-position: 100% 100%, 100% 100%, 50% 50%, 100% 100%;
     }
   }
   
   @keyframes holo-bg {
-    0% {
-      background-position: 0 var(--background-y), 0 0, center;
+    0%, 100% {
+      background-position: 0% 0%, 0% 0%, 50% 50%;
     }
-  
-    100% {
-      background-position: 0 var(--background-y), 90% 90%, center;
+    50% {
+      background-position: 100% 100%, 100% 100%, 50% 50%;
     }
   }
   
+  /* Mobile Responsive Styles */
   @media (max-width: 768px) {
     .pc-card {
       height: 70svh;
       max-height: 450px;
+      min-height: 350px;
+      aspect-ratio: 0.75;
     }
-  
+    
     .pc-details {
-      top: 2em;
+      gap: 6px;
+      bottom: 85px;
+      left: 15px;
+      right: 15px;
     }
-  
+    
     .pc-details h3 {
-      font-size: min(4svh, 2.5em);
+      font-size: 20px;
     }
-  
+    
     .pc-details p {
       font-size: 14px;
     }
-  
+    
     .pc-user-info {
       bottom: 15px;
       left: 15px;
       right: 15px;
       padding: 10px 12px;
     }
-  
+    
     .pc-mini-avatar {
-      width: 28px;
-      height: 28px;
+      width: 40px;
+      height: 40px;
     }
-  
+    
     .pc-user-details {
       gap: 10px;
     }
-  
+    
     .pc-handle {
       font-size: 13px;
     }
-  
+    
     .pc-status {
-      font-size: 10px;
+      font-size: 11px;
     }
-  
+    
     .pc-contact-btn {
       padding: 6px 12px;
       font-size: 11px;
@@ -396,94 +400,131 @@
   
   @media (max-width: 480px) {
     .pc-card {
-      height: 60svh;
-      max-height: 380px;
+      height: 65svh;
+      max-height: 400px;
+      min-height: 300px;
+      aspect-ratio: 0.8;
     }
-  
+    
     .pc-details {
-      top: 1.5em;
+      gap: 4px;
+      bottom: 75px;
+      left: 12px;
+      right: 12px;
     }
-  
+    
     .pc-details h3 {
-      font-size: min(3.5svh, 2em);
+      font-size: 18px;
     }
-  
+    
     .pc-details p {
-      font-size: 12px;
-      top: -8px;
+      font-size: 13px;
     }
-  
+    
     .pc-user-info {
       bottom: 12px;
       left: 12px;
       right: 12px;
       padding: 8px 10px;
-      border-radius: 50px;
     }
-  
+    
     .pc-mini-avatar {
-      width: 24px;
-      height: 24px;
+      width: 36px;
+      height: 36px;
     }
-  
+    
     .pc-user-details {
       gap: 8px;
     }
-  
+    
     .pc-handle {
       font-size: 12px;
     }
-  
+    
     .pc-status {
-      font-size: 9px;
+      font-size: 10px;
     }
-  
+    
     .pc-contact-btn {
       padding: 5px 10px;
       font-size: 10px;
-      border-radius: 50px;
     }
   }
   
   @media (max-width: 320px) {
     .pc-card {
-      height: 55svh;
-      max-height: 320px;
+      height: 60svh;
+      max-height: 350px;
+      min-height: 250px;
     }
-  
+    
+    .pc-details {
+      bottom: 65px;
+      left: 10px;
+      right: 10px;
+    }
+    
     .pc-details h3 {
-      font-size: min(3svh, 1.5em);
+      font-size: 16px;
     }
-  
+    
     .pc-details p {
-      font-size: 11px;
+      font-size: 12px;
     }
-  
+    
     .pc-user-info {
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
       padding: 6px 8px;
-      border-radius: 50px;
     }
-  
+    
     .pc-mini-avatar {
-      width: 20px;
-      height: 20px;
+      width: 32px;
+      height: 32px;
     }
-  
+    
     .pc-user-details {
       gap: 6px;
     }
-  
+    
     .pc-handle {
       font-size: 11px;
     }
-  
+    
     .pc-status {
-      font-size: 8px;
+      font-size: 9px;
     }
-  
+    
     .pc-contact-btn {
       padding: 4px 8px;
       font-size: 9px;
-      border-radius: 50px;
+    }
+  }
+  
+  /* Touch device optimizations */
+  @media (hover: none) and (pointer: coarse) {
+    .pc-card-wrapper {
+      touch-action: manipulation;
+    }
+    
+    .pc-card {
+      transition: transform 0.3s ease;
+    }
+    
+    .pc-card.active {
+      transition: none;
+    }
+  }
+  
+  /* High DPI displays */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .pc-card {
+      transform: translate3d(0, 0, 0.1px) rotateX(0deg) rotateY(0deg);
+    }
+    
+    .pc-card:hover,
+    .pc-card.active {
+      transform: translate3d(0, 0, 0.1px) rotateX(var(--rotate-y)) rotateY(var(--rotate-x));
     }
   }

@@ -38,7 +38,7 @@ export default function Lanyard({
   transparent = true,
 }: LanyardProps) {
   return (
-    <div className="relative z-0 w-full h-screen flex justify-center items-center transform scale-100 origin-center">
+    <div className="relative z-0 w-full h-screen flex justify-center items-center transform scale-100 origin-center lanyard-container">
       <Canvas
         camera={{ position, fov }}
         gl={{ alpha: transparent }}
@@ -128,6 +128,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
   );
   const [dragged, drag] = useState<false | THREE.Vector3>(false);
   const [hovered, hover] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const [isSmall, setIsSmall] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
@@ -135,6 +136,19 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
     }
     return false;
   });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const isSmallScreen = window.innerWidth < 768;
+      // Only consider it mobile if it's both touch-capable AND small screen
+      setIsMobile(isTouch && isSmallScreen);
+    };
+    
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     const handleResize = (): void => {
@@ -154,13 +168,10 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
 
   useEffect(() => {
     if (hovered) {
-      const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-      if (!isTouch) {
-        document.body.style.cursor = dragged ? "grabbing" : "grab";
-        return () => {
-          document.body.style.cursor = "auto";
-        };
-      }
+      document.body.style.cursor = dragged ? "grabbing" : "grab";
+      return () => {
+        document.body.style.cursor = "auto";
+      };
     }
   }, [hovered, dragged]);
   
@@ -211,6 +222,70 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
   }
 
+  const handlePointerDown = (e: any) => {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation();
+    }
+    
+    console.log('Pointer down event:', e?.type, 'isMobile:', isMobile);
+    
+    if (e?.target && typeof e.target.setPointerCapture === 'function') {
+      e.target.setPointerCapture(e.pointerId);
+    }
+
+    const pointer = e?.point ?? e?.touches?.[0];
+    if (pointer) {
+      console.log('Setting drag with pointer:', pointer);
+      drag(
+        new THREE.Vector3().copy(pointer).sub(card.current.translation())
+      );
+    }
+  };
+
+  const handlePointerUp = (e: any) => {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation();
+    }
+    
+    console.log('Pointer up event:', e?.type);
+    
+    if (e?.target && typeof e.target.releasePointerCapture === 'function') {
+      e.target.releasePointerCapture(e.pointerId);
+    }
+    
+    drag(false);
+
+    // Optional: make the card "jump" slightly
+    card.current?.applyImpulse({ x: 0, y: 5, z: 0 }, true);
+  };
+
+  const handlePointerMove = (e: any) => {
+    if (dragged && typeof dragged !== "boolean") {
+      if (e && typeof e.preventDefault === 'function') {
+        e.preventDefault();
+      }
+      if (e && typeof e.stopPropagation === 'function') {
+        e.stopPropagation();
+      }
+    }
+  };
+
+  const handlePointerOver = () => {
+    console.log('Pointer over, isMobile:', isMobile);
+    hover(true);
+  };
+
+  const handlePointerOut = () => {
+    console.log('Pointer out');
+    hover(false);
+  };
+
   return (
     <>
       <group position={[0, 4, 0]}>
@@ -232,27 +307,18 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
         >
           <CuboidCollider args={[0.8, 1.125, 0.01]} />
           <group
-  scale={2.25}
-  position={[0, -1.2, -0.05]}
-  onPointerOver={() => hover(true)}
-  onPointerOut={() => hover(false)}
-  onPointerUp={(e: any) => {
-    e.target.releasePointerCapture(e.pointerId);
-    drag(false);
-
-    // Optional: make the card "jump" slightly
-    card.current?.applyImpulse({ x: 0, y: 5, z: 0 }, true);
-  }}
-  onPointerDown={(e: any) => {
-    e.target.setPointerCapture(e.pointerId);
-
-    const pointer = e.point ?? e.touches?.[0];
-    drag(
-      new THREE.Vector3().copy(pointer).sub(card.current.translation())
-    );
-  }}
->
-
+            scale={2.25}
+            position={[0, -1.2, -0.05]}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
+            onPointerMove={handlePointerMove}
+            onTouchStart={handlePointerDown}
+            onTouchEnd={handlePointerUp}
+            onTouchMove={handlePointerMove}
+            className="touch-interactive"
+          >
             <mesh geometry={nodes.card.geometry}>
               <meshPhysicalMaterial
                 map={materials.base.map}

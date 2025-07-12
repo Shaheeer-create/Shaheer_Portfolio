@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import PortfolioLanding from "../portfolio-landing"
 import SimplePortfolio from "../simple-portfolio"
 import DetailedPortfolio from "../detailed-portfolio"
@@ -16,6 +16,13 @@ export default function Page() {
   const handleBack = () => {
     setCurrentView("landing")
   }
+
+  // Scroll to top when view changes
+  useEffect(() => {
+    if (currentView !== "landing") {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [currentView])
 
   return (
     <>

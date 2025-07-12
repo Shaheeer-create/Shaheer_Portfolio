@@ -6,12 +6,18 @@ import { ExternalLink, Github, Mail, Linkedin, Twitter, MapPin, Calendar, Phone,
 import Link from "next/link"
 import AnimatedBackButton from "@/components/ui/AnimateBackButton"
 import Image from "next/image"
+import { useEffect } from "react"
 
 interface DetailedPortfolioProps {
   onBack: () => void
 }
 
 export default function DetailedPortfolio({ onBack }: DetailedPortfolioProps) {
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -28,6 +34,8 @@ export default function DetailedPortfolio({ onBack }: DetailedPortfolioProps) {
                 <Image
                   src="/image1.png"
                   alt="Shaheer Naeem - Full Stack Developer"
+                  width={200}
+                  height={200}
                   className="w-full h-full object-cover transition-all duration-300 group-hover:scale-110"
                 />
               </div>
