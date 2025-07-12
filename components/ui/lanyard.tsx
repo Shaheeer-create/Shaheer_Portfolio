@@ -230,7 +230,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
       e.stopPropagation();
     }
     
-    console.log('Pointer down event:', e?.type, 'isMobile:', isMobile);
+    console.log('Pointer down event:', e?.type, 'isMobile:', isMobile, 'pointerType:', e?.pointerType);
     
     if (e?.target && typeof e.target.setPointerCapture === 'function') {
       e.target.setPointerCapture(e.pointerId);
@@ -253,7 +253,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
       e.stopPropagation();
     }
     
-    console.log('Pointer up event:', e?.type);
+    console.log('Pointer up event:', e?.type, 'pointerType:', e?.pointerType);
     
     if (e?.target && typeof e.target.releasePointerCapture === 'function') {
       e.target.releasePointerCapture(e.pointerId);
@@ -314,9 +314,6 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
             onPointerDown={handlePointerDown}
             onPointerUp={handlePointerUp}
             onPointerMove={handlePointerMove}
-            onTouchStart={handlePointerDown}
-            onTouchEnd={handlePointerUp}
-            onTouchMove={handlePointerMove}
             className="touch-interactive"
           >
             <mesh geometry={nodes.card.geometry}>

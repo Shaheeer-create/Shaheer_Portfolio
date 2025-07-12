@@ -73,18 +73,18 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
   const wrapRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [isTouching, setIsTouching] = useState(false);
 
   // Detect mobile device
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const isSmallScreen = window.innerWidth < 768;
+      setIsMobile(isTouch && isSmallScreen);
     };
     
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const animationHandlers = useMemo(() => {
@@ -218,8 +218,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
   );
 
   // Touch event handlers for mobile
-  const handleTouchStart = useCallback((event: React.TouchEvent) => {
-    setIsTouching(true);
+  const handleTouchStart = useCallback(() => {
     const card = cardRef.current;
     const wrap = wrapRef.current;
 
@@ -248,7 +247,6 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
   }, [animationHandlers]);
 
   const handleTouchEnd = useCallback((event: React.TouchEvent) => {
-    setIsTouching(false);
     const card = cardRef.current;
     const wrap = wrapRef.current;
 
