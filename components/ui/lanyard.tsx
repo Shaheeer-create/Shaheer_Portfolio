@@ -314,7 +314,6 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
             onPointerDown={handlePointerDown}
             onPointerUp={handlePointerUp}
             onPointerMove={handlePointerMove}
-            className="touch-interactive"
           >
             <mesh geometry={nodes.card.geometry}>
               <meshPhysicalMaterial
